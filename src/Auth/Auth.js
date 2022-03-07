@@ -24,6 +24,7 @@ export default class Auth {
 
   handleAuthentication() {
     this.auth0.parseHash((err, authResult) => {
+      console.log(authResult)
       if (authResult) {
         this.setSession(authResult);
         localStorage.setItem("user_id", "user-id");
