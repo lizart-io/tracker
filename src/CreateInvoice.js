@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { TodoForm } from "./TodoForm";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { deleteTodo, getTodo, updateTodo } from "./api";
+import Invoice from "./components/Invoice";
 
-export const EditTodo = () => {
+export const CreateInvoice = () => {
   const match = useRouteMatch();
   const [todo, setTodo] = useState();
   const history = useHistory();
@@ -16,20 +17,15 @@ export const EditTodo = () => {
     fetchTodo();
   }, [match.params.id]);
 
-  const onSubmit = async (data) => {
-    await updateTodo(data, match.params.id);
-    history.push("/");
-  };
-  const onDelete = async (_id) => {
-    await deleteTodo(_id);
-    history.push("/");
-  };
-
   return todo ? (
-    <div className="container">
+    <div className="mb-5">
       <div className="mt-3">
-        <h3>Edit Client</h3>
-        <TodoForm todo={todo} onSubmit={onSubmit} onDelete={onDelete} />
+        <div className="d-flex justify-content-center h3 ml-3">
+          Creating Invoice for {todo.firstName}&nbsp;{todo.lastName}
+        </div>
+        <div className="container">
+          <Invoice todo={todo} />
+        </div>
       </div>
     </div>
   ) : (
