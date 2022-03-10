@@ -1,8 +1,17 @@
+let url;
+if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+  url = "http://localhost:3001";
+} else {
+  url = "https://my-leads-api.herokuapp.com";
+}
+
+const api = (endpoint) => url + endpoint;
+
 export const getTodos = () =>
-  fetch("http://localhost:3001/leads").then((res) => res.json());
+  fetch(api('/leads')).then((res) => res.json());
 
 export const createTodo = (todo) =>
-  fetch("http://localhost:3001/leads", {
+  fetch(api('/leads'), {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -12,7 +21,7 @@ export const createTodo = (todo) =>
   });
 
 export const sendInvoice = (data) =>
-  fetch("http://localhost:3001/invoice/send", {
+  fetch(api("/invoice/send"), {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -22,7 +31,7 @@ export const sendInvoice = (data) =>
   });
 
 export const updateTodo = (todo, id) =>
-  fetch(`http://localhost:3001/leads/${id}`, {
+  fetch(api(`/leads/${id}`), {
     method: "PUT",
     headers: {
       Accept: "application/json",
@@ -31,9 +40,8 @@ export const updateTodo = (todo, id) =>
     body: JSON.stringify(todo),
   });
 export const deleteTodo = (id) =>
-  fetch(`http://localhost:3001/leads/${id}`, {
+  fetch(api(`/leads/${id}`), {
     method: "DELETE",
   });
 
-export const getTodo = (id) =>
-  fetch(`http://localhost:3001/leads/${id}`).then((res) => res.json());
+export const getTodo = (id) => fetch(api(`/leads/${id}`)).then((res) => res.json());

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { date } from "../utils/time";
 import { sendInvoice } from "../api";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
@@ -8,6 +7,8 @@ export default function Invoice({ todo }) {
   const history = useHistory();
   const [cost, setCost] = useState(0);
   const [items, setItems] = useState([]);
+  const [method, setMethod] = useState("");
+  const [status, setStatus] = useState("");
   const [_item, _setItem] = useState({
     name: "",
     quantity: "",
@@ -20,21 +21,23 @@ export default function Invoice({ todo }) {
   const pushItemToState = () => {
     if (!_item.name && !_item.quantity) {
       alert("You need to add the item name & quantity");
+      return;
     }
     setItems((items) => [
       ...items,
       { name: _item.name, quantity: _item.quantity },
     ]);
-    _setItem({ name: "item", quantity: "quantity" });
+    _setItem({ name: "", quantity: "" });
+
+    console.log(items);
   };
 
   const onSendInvoice = async (e) => {
     e.preventDefault();
-    console.log("jjj");
+
     const response = await sendInvoice({
       client: todo,
-      cost,
-      items,
+      email: invoice(todo, items, cost, method, status),
     });
 
     console.log(response);
@@ -55,7 +58,7 @@ export default function Invoice({ todo }) {
         <div className="input-group mb-3">
           <span className="input-group-text">$</span>
           <input
-            type="text"
+            type="number"
             className="form-control"
             aria-label="Amount (to the nearest dollar)"
             onChange={(e) => {
@@ -64,6 +67,29 @@ export default function Invoice({ todo }) {
             }}
           />
         </div>
+        <hr />
+        <select
+          className="form-select"
+          name="paymentMethod"
+          aria-label="Default select example"
+          onChange={(e) => setMethod(e.target.value)}
+        >
+          <option selected>Select Agreed Payment Method</option>
+          <option value="Cash">Cash</option>
+          <option value="Check">Check</option>
+        </select>
+        <hr />
+        <select
+          className="form-select"
+          name="invoiceStatus"
+          aria-label="Default select example"
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          <option selected>Select Invoice Status</option>
+          <option value="Not Paid Yet">Not Paid Yet</option>
+          <option value="Paid">Paid</option>
+        </select>
+        <hr className="pt-4" />
         <label>Items and Quantities: {items.length}</label>
         <br />
         {items.length >= 1 && (
@@ -100,16 +126,21 @@ export default function Invoice({ todo }) {
         </div>
       </div>
 
-      <div className="container">
-        <RenderInvoice invoice={invoice(todo, items, cost)} />
-      </div>
+      {window.screen.availWidth >= 800 && (
+        <div>
+          <code className="text-primary">Invoice - Email Preview</code>
+          <div className="container border border-primary py-5">
+            <RenderInvoice
+              invoice={invoice(todo, items, cost, method, status)}
+            />
+          </div>
+        </div>
+      )}
       <div className="container">
         <button
           className="btn btn-primary btn-lg shadow-lg mt-5"
           onClick={onSendInvoice}
-        >
-          Send Invoice!
-        </button>
+        >Send Invoice</button>
       </div>
     </>
   );
