@@ -5,10 +5,12 @@ import { useHistory } from "react-router-dom";
 import { RenderInvoice, invoice } from "../emails/invoice";
 export default function Invoice({ todo }) {
   const history = useHistory();
+  const [loading, setLoading] = useState(false);
   const [cost, setCost] = useState(0);
   const [items, setItems] = useState([]);
   const [method, setMethod] = useState("");
   const [status, setStatus] = useState("");
+  const [buttonMsg, setButtonMsg] = useState("Send Invoice");
   const [_item, _setItem] = useState({
     name: "",
     quantity: "",
@@ -34,15 +36,16 @@ export default function Invoice({ todo }) {
 
   const onSendInvoice = async (e) => {
     e.preventDefault();
-
+    setButtonMsg('Sending....')
+    setLoading(true);
     const response = await sendInvoice({
       client: todo,
       email: invoice(todo, items, cost, method, status),
     });
 
-    console.log(response);
     if (response.ok) {
-      toast.success("Invoice was sent successfully!");
+      toast.success(`${todo.firstName} has recieved your invoice!`);
+      setButtonMsg("Invoice Sent ✔️ ");
       history.push("/");
     } else if (!response.status === 200) {
       toast.error(
@@ -129,7 +132,7 @@ export default function Invoice({ todo }) {
       {window.screen.availWidth >= 800 && (
         <div>
           <code className="text-primary">Invoice - Email Preview</code>
-          <div className="container border border-primary py-5">
+          <div className="border border-primary pt-5">
             <RenderInvoice
               invoice={invoice(todo, items, cost, method, status)}
             />
@@ -140,7 +143,10 @@ export default function Invoice({ todo }) {
         <button
           className="btn btn-primary btn-lg shadow-lg mt-5"
           onClick={onSendInvoice}
-        >Send Invoice</button>
+          disabled={loading}
+        >
+          {buttonMsg}
+        </button>
       </div>
     </>
   );
